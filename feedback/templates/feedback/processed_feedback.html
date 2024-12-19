@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processed Feedback</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .empty-feedback {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Processed Feedback</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Course ID</th>
+            <th>Instructor</th>
+            <th>Raw Feedback</th>
+            <th>Processed Feedback</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for feedback in feedbacks %}
+        <tr>
+            <td>{{ feedback.course_id }}</td>
+            <td>{{ feedback.instructor }}</td>
+            <td>{{ feedback.feedback_text }}</td>
+            <td>
+                {% if feedback.processed_feedback %}
+                    {{ feedback.processed_feedback }}
+                {% else %}
+                    <span class="empty-feedback">No processed feedback available</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Optionally, add a navigation link -->
+<br>
+<a href="{% url 'home' %}">Back to Home</a>
+
+</body>
+</html>
