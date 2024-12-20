@@ -70,8 +70,8 @@ pipeline {
                     docker-compose up --build -d
 
                     echo "Running migrations..."
-                    docker-compose exec web python manage.py makemigrations --no-input
-                    docker-compose exec web python manage.py migrate --no-input
+                    docker-compose run --rm web python manage.py makemigrations --no-input
+                    docker-compose run --rm web python manage.py migrate --no-input
                     '''
                 }
             }
