@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKERHUB_REPO = "abhishek199/lms-application" // Your DockerHub repository
+        DOCKERHUB_REPO = "abhishek199/lms-application" // DockerHub repository
+        COMPOSE_FILE = "docker-compose.yml"
     }
 
     stages {
@@ -25,7 +26,7 @@ pipeline {
             }
         }
 
-        stage('Build and Push to DockerHub') {
+        stage('Build and Push Docker Image') {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
@@ -36,13 +37,15 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy with Docker Compose') {
             steps {
-                sh '''
-                docker pull ${DOCKERHUB_REPO}:latest
-                docker stop feedback_system || true && docker rm feedback_system || true
-                docker run -d --name feedback_system -p 8000:8000 --env-file .env ${DOCKERHUB_REPO}:latest
-                '''
+                script {
+                    sh '''
+                    docker-compose down || true
+                    docker-compose pull
+                    docker-compose up -d
+                    '''
+                }
             }
         }
     }
