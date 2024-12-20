@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy and fix permissions for wait-for-it.sh
 COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod 755 /app/wait-for-it.sh
+RUN chmod +x /app/wait-for-it.sh
 
 # Copy application code
 COPY . /app

@@ -55,9 +55,10 @@ pipeline {
                 script {
                     sh '''
                     echo "Deploying application with Docker Compose..."
-                    docker-compose down || true
+                    docker-compose down --volumes 
                     docker-compose pull
-                    docker-compose up --build -d
+                    docker-compose build --no-cache
+                    docker-compose up --build -d 
                     docker-compose ps
                     '''
                 }
