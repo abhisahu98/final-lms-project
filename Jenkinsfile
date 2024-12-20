@@ -1,3 +1,4 @@
+// Jenkinsfile
 pipeline {
     agent any
 
@@ -43,10 +44,6 @@ pipeline {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         echo "Building and pushing Docker image to DockerHub..."
                         def image = docker.build("${DOCKERHUB_REPO}:latest")
-
-                        // Fix permissions for wait-for-it.sh
-                        sh "docker run --rm ${DOCKERHUB_REPO}:latest chmod +x /app/wait-for-it.sh"
-
                         image.push()
                     }
                 }
@@ -61,6 +58,7 @@ pipeline {
                     docker-compose down --volumes || true
                     docker-compose pull
                     docker-compose up --build -d
+                    docker-compose ps
                     '''
                 }
             }
