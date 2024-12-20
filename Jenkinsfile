@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKERHUB_REPO = "abhishek199/lms-application" // DockerHub repository
-        COMPOSE_FILE = "docker-compose.yml"
+        DOCKERHUB_REPO = "abhishek199/lms-application"
     }
 
     stages {
@@ -17,10 +16,9 @@ pipeline {
         stage('Clean Previous Docker Image') {
             steps {
                 script {
-                    // Delete existing image from DockerHub
                     sh """
                     docker login -u ${DOCKER_CREDENTIALS_USR} -p ${DOCKER_CREDENTIALS_PSW}
-                    curl -X DELETE "https://hub.docker.com/v2/repositories/${DOCKERHUB_REPO}/tags/latest/"
+                    curl -X DELETE "https://hub.docker.com/v2/repositories/${DOCKERHUB_REPO}/tags/latest/" || true
                     """
                 }
             }
@@ -43,7 +41,7 @@ pipeline {
                     sh '''
                     docker-compose down || true
                     docker-compose pull
-                    docker-compose up -d
+                    docker-compose up --build -d
                     '''
                 }
             }
