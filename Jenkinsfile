@@ -1,4 +1,3 @@
-// Jenkinsfile
 pipeline {
     agent any
 
@@ -38,6 +37,17 @@ pipeline {
             }
         }
 
+        stage('Prepare Docker Build') {
+            steps {
+                script {
+                    sh '''
+                    echo "Setting execute permissions for wait-for-it.sh..."
+                    chmod +x wait-for-it.sh
+                    '''
+                }
+            }
+        }
+
         stage('Build and Push Docker Image') {
             steps {
                 script {
@@ -58,6 +68,10 @@ pipeline {
                     docker-compose down --volumes
                     docker-compose build --no-cache
                     docker-compose up --build -d
+
+                    echo "Running migrations..."
+                    docker-compose exec web python manage.py makemigrations --no-input
+                    docker-compose exec web python manage.py migrate --no-input
                     '''
                 }
             }
