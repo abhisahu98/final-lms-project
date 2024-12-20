@@ -20,3 +20,5 @@ COPY . /app
 
 # Define the command to run the application
 CMD ["bash", "./wait-for-it.sh", "db:5432", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+ENV DJANGO_SETTINGS_MODULE=feedback_system.settings
