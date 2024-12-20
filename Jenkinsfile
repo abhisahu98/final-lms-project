@@ -55,7 +55,7 @@ pipeline {
                 script {
                     sh '''
                     echo "Deploying application with Docker Compose..."
-                    docker-compose down --volumes || true
+                    docker-compose down || true
                     docker-compose pull
                     docker-compose up --build -d
                     docker-compose ps
