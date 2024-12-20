@@ -5,46 +5,42 @@ from django.conf import settings
 # Set up logging
 logger = logging.getLogger(__name__)
 
-# Set OpenAI API Key
+# Ensure OpenAI API key is set
 openai.api_key = settings.OPENAI_API_KEY
 
 def send_to_gpt(content):
     """
-    Sends preprocessed feedback to GPT-4 API and returns the response.
+    Sends the cleaned feedback to GPT-4 and retrieves a processed response.
     """
     try:
         logger.info(f"Sending content to GPT-4: {content}")
 
-        # Correct syntax for OpenAI Python SDK <= 0.28.0
+        # OpenAI GPT-4 API call
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": f"Please rephrase and correct this feedback: '{content}'."}
-            ]
+                {"role": "system", "content": "You are an assistant that processes and improves feedback."},
+                {"role": "user", "content": f"Please clean up and improve this feedback: '{content}'"}
+            ],
+            temperature=0.7,  # Slight randomness for creative but consistent responses
+            max_tokens=200
         )
 
-        # Access response content
-        processed_feedback = response['choices'][0]['message']['content'].strip()
+        # Extract the processed text
+        processed_feedback = response.choices[0].message.content.strip()
         logger.info(f"GPT-4 Response: {processed_feedback}")
-
         return processed_feedback
 
     except openai.error.OpenAIError as e:
         logger.error(f"OpenAI API Error: {e}")
-        return content
+        return "Error: Unable to process feedback due to API issues."
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
-        return content
+        logger.error(f"Unexpected error during GPT processing: {e}")
+        return "Error: An unexpected issue occurred while processing feedback."
+
 
 def process_feedback_with_gpt4(raw_feedback):
     """
-    Processes raw feedback using GPT-4.
+    Processes feedback with GPT-4 API. Returns the processed feedback or raw feedback on failure.
     """
-    try:
-        processed_feedback = send_to_gpt(raw_feedback)
-        logger.info(f"Final Processed Feedback: {processed_feedback}")
-        return processed_feedback
-    except Exception as e:
-        logger.error(f"Error processing feedback with GPT-4: {e}")
-        return raw_feedback
+    return send_to_gpt(raw_feedback)
