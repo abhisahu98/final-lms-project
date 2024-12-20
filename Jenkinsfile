@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USERNAME = credentials('dockerhub-username')
-        DOCKERHUB_TOKEN = credentials('dockerhub-token')
+        DOCKER_CREDENTIALS = credentials('dockerhub-credentials')
     }
 
     stages {
@@ -17,7 +16,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        def image = docker.build("${DOCKERHUB_USERNAME}/feedback_system:latest")
+                        def image = docker.build("feedback_system:latest")
                         image.push()
                     }
                 }
@@ -27,9 +26,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                docker pull ${DOCKERHUB_USERNAME}/feedback_system:latest
+                docker pull feedback_system:latest
                 docker stop feedback_system || true && docker rm feedback_system || true
-                docker run -d --name feedback_system -p 8000:8000 --env-file .env ${DOCKERHUB_USERNAME}/feedback_system:latest
+                docker run -d --name feedback_system -p 8000:8000 --env-file .env feedback_system:latest
                 '''
             }
         }
