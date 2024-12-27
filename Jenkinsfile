@@ -7,6 +7,12 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                deleteDir() // Clean the workspace before starting
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 checkout scm
@@ -58,9 +64,7 @@ pipeline {
     post {
         always {
             echo "Pipeline execution complete!"
-            sh '''
-            docker-compose ps
-            '''
+            sh 'docker-compose ps'
         }
         failure {
             echo "Pipeline execution failed!"
