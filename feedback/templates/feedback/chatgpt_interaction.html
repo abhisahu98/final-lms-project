@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Interaction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .feedback {
+            font-size: 16px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e7f5ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            color: #004085;
+        }
+        .chat-box {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .chat-box p {
+            margin: 10px 0;
+        }
+        .chat-box .user-message {
+            text-align: right;
+            color: #333;
+        }
+        .chat-box .assistant-message {
+            text-align: left;
+            color: #007bff;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ChatGPT Assistance</h1>
+        <p class="feedback"><strong>Your Feedback:</strong> {{ feedback.processed_feedback }}</p>
+
+        <div class="chat-box">
+            {% for message in chat_history %}
+                {% if message.role == 'user' %}
+                    <p class="user-message"><strong>You:</strong> {{ message.content }}</p>
+                {% else %}
+                    <p class="assistant-message"><strong>ChatGPT:</strong> {{ message.content }}</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <textarea name="user_message" placeholder="Type your message here..." rows="4" required></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</body>
+</html>
