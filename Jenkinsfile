@@ -9,22 +9,13 @@ pipeline {
     stages {
         stage('Clean Workspace') {
             steps {
-                deleteDir() // Clean the workspace before starting
+                deleteDir() // Clean the Jenkins workspace
             }
         }
 
         stage('Checkout Code') {
             steps {
                 checkout scm
-            }
-        }
-
-        stage('Clean Previous Docker Resources') {
-            steps {
-                sh '''
-                docker-compose down --volumes || true
-                docker system prune -af || true
-                '''
             }
         }
 

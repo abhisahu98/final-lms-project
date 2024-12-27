@@ -2,8 +2,7 @@ version: "3.8"
 
 services:
   web:
-    build:
-      context: .
+    build: .
     command: ["./wait-for-it.sh", "db:5432", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
       - .:/app
@@ -16,8 +15,6 @@ services:
         condition: service_started
     env_file:
       - .env  # Load environment variables from .env file
-    networks:
-      - feedback_network
 
   db:
     image: postgres:14
@@ -27,19 +24,15 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data
-    networks:
-      - feedback_network
 
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
-    networks:
-      - feedback_network
 
 volumes:
   postgres_data:  # Define the named volume
 
 networks:
-  feedback_network:  # Define a custom network
-    name: feedback_system_network
+  default:
+    name: feedback_system_default
