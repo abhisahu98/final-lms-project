@@ -22,9 +22,12 @@ pipeline {
             }
         }
 
-        stage('Prepare Docker Build') {
+        stage('Prepare Docker Environment') {
             steps {
-                sh 'chmod +x wait-for-it.sh'
+                sh '''
+                chmod +x wait-for-it.sh
+                dos2unix wait-for-it.sh
+                '''
             }
         }
 
@@ -39,7 +42,7 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Deploy Application') {
             steps {
                 sh '''
                 docker-compose down --volumes
@@ -49,6 +52,21 @@ pipeline {
                 docker-compose run --rm web python manage.py migrate --no-input
                 '''
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline execution complete!"
+            sh '''
+            docker-compose ps
+            '''
+        }
+        failure {
+            echo "Pipeline execution failed!"
+        }
+        success {
+            echo "Pipeline executed successfully!"
         }
     }
 }

@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy and fix permissions for wait-for-it.sh
 COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod +x /app/wait-for-it.sh
+RUN chmod +x /app/wait-for-it.sh && dos2unix /app/wait-for-it.sh
 
 # Copy application code
 COPY . /app
@@ -21,4 +21,5 @@ COPY . /app
 # Define the command to run the application
 CMD ["bash", "./wait-for-it.sh", "db:5432", "--", "python", "manage.py", "runserver", "0.0.0.0:8000"]
 
+# Set environment variable for Django settings
 ENV DJANGO_SETTINGS_MODULE=feedback_system.settings
