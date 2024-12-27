@@ -10,7 +10,7 @@ services:
       - "8000:8000"
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy  # Ensure PostgreSQL is healthy before starting the web service
       redis:
         condition: service_started
     env_file:
@@ -18,12 +18,19 @@ services:
 
   db:
     image: postgres:14
-    env_file:
-      - .env  # Load environment variables for PostgreSQL
+    environment:  # Explicitly define environment variables for PostgreSQL
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data
+    healthcheck:  # Add a health check for PostgreSQL
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:latest
