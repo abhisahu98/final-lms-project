@@ -21,7 +21,19 @@ pipeline {
 
         stage('Prepare Docker Environment') {
             steps {
+                // Verify or copy the .env file
                 sh '''
+                if [ ! -f .env ]; then
+                    echo "Creating missing .env file..."
+                    echo "DJANGO_SECRET_KEY=your-secret-key" >> .env
+                    echo "DATABASE_NAME=postgres" >> .env
+                    echo "DATABASE_USER=postgres" >> .env
+                    echo "DATABASE_PASSWORD=postgres" >> .env
+                    echo "DATABASE_HOST=db" >> .env
+                    echo "DATABASE_PORT=5432" >> .env
+                    echo "REDIS_HOST=redis" >> .env
+                    echo "REDIS_PORT=6379" >> .env
+                fi
                 chmod +x wait-for-it.sh
                 dos2unix wait-for-it.sh
                 '''
@@ -55,7 +67,7 @@ pipeline {
     post {
         always {
             echo "Pipeline execution complete!"
-            sh 'docker-compose ps'
+            sh 'docker-compose ps || true'
         }
         failure {
             echo "Pipeline execution failed!"
