@@ -5,6 +5,9 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('dockerhub-credentials') // Your DockerHub credentials
         DOCKERHUB_REPO = "abhishek199/lms-application" // Your DockerHub repository
         OPENAI_API_KEY = credentials('openai-api-key') // Your OpenAI API Key credential ID in Jenkins
+        SUPERUSER_USERNAME = 'admin'
+        SUPERUSER_EMAIL = 'admin@example.com'
+        SUPERUSER_PASSWORD = '12345'
     }
 
     stages {
@@ -57,8 +60,16 @@ pipeline {
                 docker-compose down --volumes
                 docker-compose build --no-cache
                 docker-compose up -d
+
+                # Wait for services to be ready
+                echo "Waiting for PostgreSQL and Redis to be ready..."
+                sleep 10
+
                 docker-compose run --rm web python manage.py makemigrations --no-input
                 docker-compose run --rm web python manage.py migrate --no-input
+
+                # Create a new superuser
+                docker-compose run --rm web python manage.py shell -c "from django.contrib.auth.models import User; User.objects.filter(username='${SUPERUSER_USERNAME}').delete(); User.objects.create_superuser('${SUPERUSER_USERNAME}', '${SUPERUSER_EMAIL}', '${SUPERUSER_PASSWORD}')"
                 '''
             }
         }
