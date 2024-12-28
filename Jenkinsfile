@@ -31,6 +31,9 @@ pipeline {
                     echo "POSTGRES_PORT=5432" >> .env
                     echo "REDIS_HOST=redis" >> .env
                     echo "REDIS_PORT=6379" >> .env
+                    echo "REDIS_URL=redis://localhost:6379/0" >> .env
+                    echo "OPENAI_API_KEY=REMOVED_SECRET-K2kBWKmUMswVbtK-d7BmmEu3JGJEb-0gJm1iiUT3BlbkFJQ_sCTKhBTJTQZpeb70uEsFrpRFT-8Rp-1RqL6gseRTYcDezbkH0ikptz9AcD0XyhUdjwtE08UA" >> .env
+                    echo "DJANGO_SETTINGS_MODULE=feedback_system.settings" >> .env
                 fi
                 chmod +x wait-for-it.sh
                 dos2unix wait-for-it.sh
@@ -42,7 +45,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        def image = docker.build("${DOCKERHUB_REPO}:latest", "--no-cache .")
+                        def image = docker.build("${DOCKERHUB_REPO}:latest", ".")
                         image.push()
                     }
                 }
@@ -52,11 +55,34 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sh '''
-                docker-compose down --volumes
-                docker-compose build --no-cache
+                docker-compose down --remove-orphans
+                docker-compose build
                 docker-compose up -d
+
+                # Wait for DB and Redis to be ready
+                while ! docker-compose exec db pg_isready -U postgres; do
+                    echo "Waiting for PostgreSQL to be ready..."
+                    sleep 5
+                done
+                echo "PostgreSQL is ready!"
+
+                while ! docker-compose exec redis redis-cli ping | grep PONG; do
+                    echo "Waiting for Redis to be ready..."
+                    sleep 5
+                done
+                echo "Redis is ready!"
+
+                # Apply database migrations
                 docker-compose run --rm web python manage.py makemigrations --no-input
                 docker-compose run --rm web python manage.py migrate --no-input
+                '''
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                sh '''
+                curl --fail http://localhost:8000/health || echo "Health check failed!"
                 '''
             }
         }
