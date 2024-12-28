@@ -4,18 +4,19 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS = credentials('dockerhub-credentials') // Your DockerHub credentials
         DOCKERHUB_REPO = "abhishek199/lms-application" // Your DockerHub repository
+        OPENAI_API_KEY = credentials('openai-api-key') // Your OpenAI API Key credential ID in Jenkins
     }
 
     stages {
         stage('Clean Workspace') {
             steps {
-                deleteDir() // Clean the Jenkins workspace
+                deleteDir()
             }
         }
 
         stage('Checkout Code') {
             steps {
-                checkout scm // Check out the latest code from the repository
+                checkout scm
             }
         }
 
@@ -31,6 +32,7 @@ pipeline {
                     echo "POSTGRES_PORT=5432" >> .env
                     echo "REDIS_HOST=redis" >> .env
                     echo "REDIS_PORT=6379" >> .env
+                    echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> .env
                 fi
                 chmod +x wait-for-it.sh
                 dos2unix wait-for-it.sh
