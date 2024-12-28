@@ -21,16 +21,14 @@ pipeline {
 
         stage('Prepare Docker Environment') {
             steps {
-                // Verify or copy the .env file
                 sh '''
                 if [ ! -f .env ]; then
                     echo "Creating missing .env file..."
-                    echo "DJANGO_SECRET_KEY=your-secret-key" >> .env
-                    echo "DATABASE_NAME=postgres" >> .env
-                    echo "DATABASE_USER=postgres" >> .env
-                    echo "DATABASE_PASSWORD=postgres" >> .env
-                    echo "DATABASE_HOST=db" >> .env
-                    echo "DATABASE_PORT=5432" >> .env
+                    echo "POSTGRES_DB=feedback_db" >> .env
+                    echo "POSTGRES_USER=postgres" >> .env
+                    echo "POSTGRES_PASSWORD=12345" >> .env
+                    echo "POSTGRES_HOST=db" >> .env
+                    echo "POSTGRES_PORT=5432" >> .env
                     echo "REDIS_HOST=redis" >> .env
                     echo "REDIS_PORT=6379" >> .env
                 fi
@@ -56,7 +54,8 @@ pipeline {
                 sh '''
                 docker-compose down --volumes
                 docker-compose build --no-cache
-                docker-compose up --build -d
+                docker-compose up -d
+                docker-compose logs -f || true
                 docker-compose run --rm web python manage.py makemigrations --no-input
                 docker-compose run --rm web python manage.py migrate --no-input
                 '''
