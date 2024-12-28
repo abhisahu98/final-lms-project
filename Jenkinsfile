@@ -57,7 +57,7 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sh '''
-                docker-compose down --volumes
+                docker-compose down 
                 docker-compose build --no-cache
                 docker-compose up -d
 
