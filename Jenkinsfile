@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS = credentials('dockerhub-credentials') // Your DockerHub credentials
         DOCKERHUB_REPO = "abhishek199/lms-application" // Your DockerHub repository
+        OPENAI_API_KEY = credentials('openai-api-key') // Securely store your OpenAI API key in Jenkins
     }
 
     stages {
@@ -32,7 +33,7 @@ pipeline {
                     echo "REDIS_HOST=redis" >> .env
                     echo "REDIS_PORT=6379" >> .env
                     echo "REDIS_URL=redis://localhost:6379/0" >> .env
-                    echo "OPENAI_API_KEY=REMOVED_SECRET-K2kBWKmUMswVbtK-d7BmmEu3JGJEb-0gJm1iiUT3BlbkFJQ_sCTKhBTJTQZpeb70uEsFrpRFT-8Rp-1RqL6gseRTYcDezbkH0ikptz9AcD0XyhUdjwtE08UA" >> .env
+                    echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
                     echo "DJANGO_SETTINGS_MODULE=feedback_system.settings" >> .env
                 fi
                 chmod +x wait-for-it.sh
