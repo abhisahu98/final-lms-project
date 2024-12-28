@@ -42,7 +42,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        def image = docker.build("${DOCKERHUB_REPO}:latest")
+                        def image = docker.build("${DOCKERHUB_REPO}:latest", "--no-cache .")
                         image.push()
                     }
                 }
@@ -55,7 +55,6 @@ pipeline {
                 docker-compose down --volumes
                 docker-compose build --no-cache
                 docker-compose up -d
-                docker-compose logs -f || true
                 docker-compose run --rm web python manage.py makemigrations --no-input
                 docker-compose run --rm web python manage.py migrate --no-input
                 '''
