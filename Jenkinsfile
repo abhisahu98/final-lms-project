@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKERHUB_REPO = "abhishek199/lms-application"
+        DOCKER_CREDENTIALS = credentials('dockerhub-credentials') // Your DockerHub credentials
+        DOCKERHUB_REPO = "abhishek199/lms-application" // Your DockerHub repository
     }
 
     stages {
@@ -15,7 +15,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                checkout scm
+                checkout scm // Check out the latest code from the repository
             }
         }
 
